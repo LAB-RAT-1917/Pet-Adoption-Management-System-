@@ -1,0 +1,138 @@
+/* style.css
+   Project: Pet Adoption Management System (CIS 344 Group Project).
+   Purpose: The look of every page. One file, so every page matches.
+   Works on phones and computers (Requirement: pages work on both). */
+
+/* 1. COLORS AND FONT
+   Without these, each page would pick its own colors. Change a color here and it changes everywhere. */
+:root {
+    --brand: #2f6f6a;          /* Store teal, for the header and buttons. */
+    --brand-dark: #24524e;     /* Darker teal, for hover. */
+    --accent: #f2a65a;         /* Warm orange, for the current menu link. */
+    --bg: #f7f5f2;             /* Soft page background. */
+    --card: #ffffff;           /* White boxes and tables. */
+    --text: #222222;           /* Main text, dark for easy reading. */
+    --muted: #666666;          /* Gray for smaller text. */
+    --line: #e2ddd6;           /* Thin borders. */
+}
+
+/* 2. PAGE BASICS */
+* { box-sizing: border-box; }                       /* Widths include padding, so boxes don't spill over. */
+body {
+    margin: 0;                                      /* Remove the browser's default gap. */
+    font-family: "Segoe UI", Arial, sans-serif;     /* Clean font that every Windows computer has. */
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;                               /* Space between lines, easier to read. */
+}
+.page {
+    max-width: 1100px;                              /* Keeps lines from getting too wide on big screens. */
+    margin: 0 auto;                                 /* Centers the content. */
+    padding: 24px 16px;
+}
+h1 { margin-top: 0; }
+
+/* 3. HEADER AND MENU */
+.site-header {
+    background: var(--brand);
+    display: flex;                                  /* Store name on the left, menu on the right. */
+    flex-wrap: wrap;                                /* On a phone, the menu moves under the name. */
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 24px;
+    padding: 12px 16px;
+}
+.logo {
+    color: #ffffff;
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-decoration: none;                          /* No underline on the store name. */
+}
+.menu { display: flex; flex-wrap: wrap; gap: 4px; }
+.menu a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;                             /* Rounded corners. */
+}
+.menu a:hover { background: var(--brand-dark); }   /* Darker when the mouse is over it. */
+.menu a.active { background: var(--accent); color: #222222; }   /* The section you're on. */
+
+/* 4. HOME PAGE BOXES */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));   /* Side by side on a computer, stacked on a phone. */
+    gap: 16px;
+    margin-top: 24px;
+}
+.card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px;
+    text-decoration: none;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;                         /* Number on top, label under it. */
+}
+.card:hover { border-color: var(--brand); }         /* Shows the box can be clicked. */
+.card-number { font-size: 2.2rem; font-weight: bold; color: var(--brand); }
+.card-label { color: var(--muted); }
+
+/* 5. TABLES (for the list pages) */
+.table-wrap { overflow-x: auto; }                   /* Lets wide tables scroll sideways on a phone. */
+table {
+    width: 100%;
+    border-collapse: collapse;                      /* One line between cells instead of two. */
+    background: var(--card);
+}
+th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+}
+th { background: #eef4f3; }                         /* Light teal header row. */
+tr:hover td { background: #faf8f5; }                /* Highlights the row under the mouse. */
+
+/* 6. FORMS AND BUTTONS (for the add and edit pages) */
+label { display: block; margin-top: 12px; font-weight: bold; }
+input, select, textarea {
+    width: 100%;                                    /* Full width, easy to tap on a phone. */
+    max-width: 420px;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font: inherit;                                  /* Same font as the rest of the page. */
+}
+.button {
+    display: inline-block;
+    background: var(--brand);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    text-decoration: none;
+    cursor: pointer;                                /* Hand cursor, so it looks clickable. */
+    font: inherit;
+}
+.button:hover { background: var(--brand-dark); }
+.button.danger { background: #b3261e; }             /* Red, for Delete and Reject. */
+
+/* 7. MESSAGES AND STATUS LABELS */
+.message { padding: 10px 14px; border-radius: 6px; margin: 12px 0; }
+.message.success { background: #e3f4e8; color: #1e5631; }   /* Green: it worked. */
+.message.error { background: #fbe4e2; color: #8a1c14; }     /* Red: something went wrong. */
+.status { padding: 2px 10px; border-radius: 999px; font-size: 0.85rem; white-space: nowrap; }   /* Small rounded label. */
+.status.Available, .status.Approved { background: #e3f4e8; color: #1e5631; }   /* Green */
+.status.Pending { background: #fff1d6; color: #7a4b00; }                       /* Yellow */
+.status.Adopted { background: #e3edfb; color: #1d3f73; }                       /* Blue */
+.status.Returned { background: #efe6f7; color: #4b2a6b; }                      /* Purple */
+.status.Rejected { background: #fbe4e2; color: #8a1c14; }                      /* Red */
+
+/* 8. FOOTER */
+.site-footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+    padding: 24px 16px;
+}
