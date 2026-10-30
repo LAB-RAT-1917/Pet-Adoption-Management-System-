@@ -136,3 +136,18 @@ input, select, textarea {
     font-size: 0.9rem;
     padding: 24px 16px;
 }
+
+/* 9. APPLICATIONS PAGES
+   Without these, the Pending / Approved / Rejected / New tabs and the Approve and Reject buttons would bunch up. */
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; border-bottom: 2px solid var(--line); }
+.tabs a {
+    padding: 8px 14px;
+    text-decoration: none;
+    color: var(--brand);
+    border-radius: 6px 6px 0 0;                     /* Rounded top corners, like folder tabs. */
+}
+.tabs a:hover { background: #eef4f3; }
+.tabs a.active { background: var(--brand); color: #ffffff; }   /* The tab you're on. */
+.decision { min-width: 260px; }                     /* Room for both buttons and the reason list. */
+.decision form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 4px 0; }
+.decision select { width: auto; flex: 1; }          /* The reason list shares the row with the Reject button. */
