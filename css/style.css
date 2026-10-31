@@ -116,7 +116,38 @@ input, select, textarea {
     font: inherit;
 }
 .button:hover { background: var(--brand-dark); }
+input[type="radio"] { width: auto; margin: 0 6px 0 0; }   /* Yes/No circles stay small instead of full width. */
+.yes-no { border: none; padding: 0; margin: 12px 0 0; }   /* The Yes/No question, without the default box around it. */
+.yes-no legend { font-weight: bold; padding: 0; }   /* The question looks like the other labels. */
+.choice { display: inline-flex; align-items: center; margin: 4px 20px 0 0; font-weight: normal; }   /* Yes and No side by side. */
+.note { color: var(--muted); font-size: 0.9rem; }   /* Small gray help text. */
+.form-buttons { display: flex; align-items: center; gap: 16px; margin-top: 16px; }   /* Save button and Cancel link side by side. */
+input[readonly], input:disabled { background: #eeeeee; color: #444444; }   /* Gray box: a set price, or an estimate box that's turned off. */
+.price-table { width: auto; margin: 8px 0; font-size: 0.9rem; }   /* Small table of set prices under the fee box. */
+.price-table th, .price-table td { padding: 4px 10px; }   /* Smaller cells than the big lists. */
+.message ul { margin: 4px 0 0; padding-left: 20px; }   /* The list of problems inside an error message. */
+.message p { margin: 0; }
 .button.danger { background: #b3261e; }             /* Red, for Delete and Reject. */
+
+/* 6b. FILTER BAR AND ROW BUTTONS (for the list pages) */
+.filter { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }   /* Filter, buttons and links in one row. */
+.filter label { margin: 0; }                        /* No gap above the label in the filter bar. */
+.filter select { width: auto; }                     /* Only as wide as the longest choice. */
+.actions { white-space: nowrap; }                   /* Keeps Edit and Delete on one line. */
+.actions form { display: inline; }                  /* Puts the Delete button next to Edit. */
+
+/* 6c. FILTER ROW (a filter box under each column title, on the Pets list) */
+.list-top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 12px; }   /* Add button and the count side by side. */
+.filter-row th { padding: 6px; background: #f6faf9; }   /* Lighter than the titles, with less space. */
+.filter-row input, .filter-row select {
+    width: 100%;                                    /* Fills its column. */
+    min-width: 75px;                                /* But never too small to read. */
+    padding: 4px 6px;
+    font-size: 0.85rem;                             /* Smaller than the form pages. */
+    font-weight: normal;                            /* Not bold, even though it sits in a title cell. */
+}
+.filter-row input[type="number"] { min-width: 55px; }   /* The ID box can be narrow. */
+.filter-row input[name="name"] { min-width: 120px; }    /* Wide enough to show "Part of a name". */
 
 /* 7. MESSAGES AND STATUS LABELS */
 .message { padding: 10px 14px; border-radius: 6px; margin: 12px 0; }
@@ -136,18 +167,3 @@ input, select, textarea {
     font-size: 0.9rem;
     padding: 24px 16px;
 }
-
-/* 9. APPLICATIONS PAGES
-   Without these, the Pending / Approved / Rejected / New tabs and the Approve and Reject buttons would bunch up. */
-.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; border-bottom: 2px solid var(--line); }
-.tabs a {
-    padding: 8px 14px;
-    text-decoration: none;
-    color: var(--brand);
-    border-radius: 6px 6px 0 0;                     /* Rounded top corners, like folder tabs. */
-}
-.tabs a:hover { background: #eef4f3; }
-.tabs a.active { background: var(--brand); color: #ffffff; }   /* The tab you're on. */
-.decision { min-width: 260px; }                     /* Room for both buttons and the reason list. */
-.decision form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 4px 0; }
-.decision select { width: auto; flex: 1; }          /* The reason list shares the row with the Reject button. */

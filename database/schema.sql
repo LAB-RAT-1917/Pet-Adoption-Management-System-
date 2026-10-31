@@ -29,6 +29,8 @@ CREATE TABLE employees (
 -- One row per pet in the store.
 -- The app handles status changes (Business rules #16 and #19).
 -- Adopted pets are never removed. Adoption only changes the status, and the pet keeps its pet_id for good (Business rule #28).
+-- Dogs, cats, rabbits and birds have a set fee for their age on the day they arrive (Business rules #29 and #30).
+-- If their birth date is unknown, staff type an estimated age instead (Business rule #31). Other animals' fees are typed (Business rule #32).
 -- Applications point here using pet_id.
 CREATE TABLE pets (
     pet_id        INT AUTO_INCREMENT PRIMARY KEY,          -- Unique ID, numbered automatically (Business rule #12).
@@ -37,12 +39,28 @@ CREATE TABLE pets (
                   NOT NULL,                                -- Kind of animal, set list only (Business rule #10).
     breed         VARCHAR(50),                             -- Optional, an animal's breed could be unknown.
     birth_date    DATE,                                    -- Optional, the app works out age from it.
+    estimated_age TINYINT UNSIGNED,                        -- Age in years on the day it arrived, typed when the birth date is unknown (Business rule #31).
     status        ENUM('Available', 'Pending', 'Adopted', 'Returned')
                   NOT NULL DEFAULT 'Available',            -- New pets start as Available (Business rule #8).
     date_added    DATE NOT NULL DEFAULT (CURRENT_DATE),    -- Filled in with today's date (Business rule #12).
-    adoption_fee  DECIMAL(6,2) NOT NULL,                   -- Price to adopt, up to $9999.99
+    adoption_fee  DECIMAL(6,2) NOT NULL,                   -- Price to adopt, in dollars and cents.
     vaccinated    BOOLEAN NOT NULL DEFAULT FALSE,          -- 1 = yes, 0 = no, starts as no.
-    CONSTRAINT chk_pets_fee CHECK (adoption_fee >= 0)      -- Fee can't be negative (Business rule #11).
+    CONSTRAINT chk_pets_fee CHECK (adoption_fee >= 0),     -- Fee can't be negative (Business rule #11).
+    CONSTRAINT chk_pets_estimate CHECK (estimated_age <= 50),                  -- An estimate is 0 to 50 years. UNSIGNED already blocks negatives (Business rule #31).
+    CONSTRAINT chk_pets_one_age CHECK (birth_date IS NULL OR estimated_age IS NULL),   -- A pet can't have both a birth date and an estimate (Business rule #31).
+    CONSTRAINT chk_pets_age_needed CHECK (species = 'Other'                    -- Dogs, cats, rabbits and birds need a birth date or an estimate,
+        OR birth_date IS NOT NULL OR estimated_age IS NOT NULL),               -- because their price depends on age (Business rule #31).
+    CONSTRAINT chk_pets_fee_by_age CHECK (                                     -- The fee must follow the price list.
+        (species = 'Other' AND adoption_fee BETWEEN 10 AND 75)                 -- Other animals: staff type a fee from $10 to $75 (Business rule #32).
+        OR (species <> 'Other' AND adoption_fee = CASE                         -- Dogs, cats, rabbits and birds: the fee must be the set price (Business rule #29).
+            -- COALESCE gives the first value that isn't NULL: the age from the birth date, or else the estimate (Business rules #30 and #31).
+            WHEN COALESCE(TIMESTAMPDIFF(YEAR, birth_date, date_added), estimated_age) < 1   -- Under 1 year old on the day it arrived:
+                THEN CASE species WHEN 'Dog' THEN 250 WHEN 'Cat' THEN 150 WHEN 'Rabbit' THEN 75 WHEN 'Bird' THEN 100 END   -- Set price for each kind.
+            WHEN COALESCE(TIMESTAMPDIFF(YEAR, birth_date, date_added), estimated_age) <= 6   -- 1 to 6 years old on the day it arrived:
+                THEN CASE species WHEN 'Dog' THEN 175 WHEN 'Cat' THEN 100 WHEN 'Rabbit' THEN 50 WHEN 'Bird' THEN 60 END   -- Set price for each kind.
+            ELSE CASE species WHEN 'Dog' THEN 100 WHEN 'Cat' THEN 50 WHEN 'Rabbit' THEN 25 WHEN 'Bird' THEN 30 END      -- 7 years and up.
+        END)
+    )
 );
 
 -- 4. ADOPTERS TABLE 

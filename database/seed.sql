@@ -65,53 +65,55 @@ INSERT INTO employees (employee_id, first_name, last_name, department) VALUES
 -- Within each kind, pets are listed by status: Adopted, Returned, Pending, then Available.
 -- Inside each status, they are listed in the order they arrived at the store.
 -- Each status matches the applications in section 5 (Business rules #8 and #16).
+-- Fees follow Business rules #29 to #32. Dogs, cats, rabbits and birds have the set price for their age when they arrived, and other animals' fees were typed.
 -- Without these pets, the applications would point to pets that don't exist.
 
 -- Dogs (17 dogs, IDs 1 to 17): Adopted 1 to 9, Pending 10 to 17
-INSERT INTO pets (name, species, breed, birth_date, status, date_added, adoption_fee, vaccinated) VALUES
-('Toto', 'Dog', 'Cairn Terrier', '2017-05-17', 'Adopted', '2020-05-30', 150.00, TRUE),            -- 1: Dorothy's dog in The Wizard of Oz.
-('Laika', 'Dog', 'Mixed', '2018-03-02', 'Adopted', '2020-08-22', 120.00, TRUE),                   -- 2: Real dog, the first animal to orbit Earth.
-('Gromit', 'Dog', 'Beagle', '2019-02-08', 'Adopted', '2020-10-17', 140.00, TRUE),                 -- 3: Wallace's clever dog in Wallace & Gromit.
-('Balto', 'Dog', 'Siberian Husky', '2019-10-10', 'Adopted', '2021-03-27', 175.00, TRUE),          -- 4: Real sled dog who helped bring medicine to Nome, Alaska.
-('Lassie', 'Dog', 'Rough Collie', '2019-04-12', 'Adopted', '2021-12-18', 200.00, TRUE),           -- 5: The loyal collie from books, movies, and TV.
-('Clifford', 'Dog', 'Labrador mix', '2020-12-01', 'Adopted', '2022-07-09', 160.00, TRUE),         -- 6: The Big Red Dog from the children's books.
-('Hachiko', 'Dog', 'Akita', '2021-11-10', 'Adopted', '2023-01-28', 225.00, TRUE),                 -- 7: Real Akita in Japan, famous for his loyalty.
-('Pluto', 'Dog', 'Bloodhound', '2020-09-05', 'Adopted', '2023-04-22', 130.00, TRUE),              -- 8: Mickey Mouse's dog.
-('Odie', 'Dog', 'Beagle mix', '2023-08-08', 'Adopted', '2025-02-15', 110.00, TRUE),               -- 9: Garfield's dog friend in the comic strip.
-('Snoopy', 'Dog', 'Beagle', '2025-10-04', 'Pending', '2026-08-29', 150.00, TRUE),                 -- 10: Charlie Brown's beagle in Peanuts.
-('Bluey', 'Dog', 'Australian Cattle Dog', '2025-10-01', 'Pending', '2026-09-10', 175.00, TRUE),   -- 11: The puppy from the cartoon Bluey.
-('Bolt', 'Dog', 'White Shepherd', '2025-11-21', 'Pending', '2026-09-11', 190.00, TRUE),           -- 12: The superhero dog from the movie Bolt.
-('Marley', 'Dog', 'Labrador Retriever', '2024-12-25', 'Pending', '2026-09-17', 165.00, TRUE),     -- 13: The lovable Labrador from Marley & Me.
-('Rin Tin Tin', 'Dog', 'German Shepherd', '2024-09-15', 'Pending', '2026-09-18', 210.00, TRUE),   -- 14: Real German Shepherd who starred in early movies.
-('Cerberus', 'Dog', 'Rottweiler mix', NULL, 'Pending', '2026-09-19', 140.00, TRUE),               -- 15: Three-headed guard dog from Greek myth. Birth date unknown.
-('Beethoven', 'Dog', 'Saint Bernard', '2023-04-03', 'Pending', '2026-09-21', 185.00, TRUE),       -- 16: The giant Saint Bernard from the movie Beethoven.
-('Scooby', 'Dog', 'Great Dane', '2025-09-13', 'Pending', '2026-09-29', 200.00, TRUE);             -- 17: Scooby-Doo, the mystery-solving Great Dane.
+-- Only this INSERT lists estimated_age, because Cerberus is the one pet with no birth date. Every other pet's estimate stays NULL (Business rule #31).
+INSERT INTO pets (name, species, breed, birth_date, estimated_age, status, date_added, adoption_fee, vaccinated) VALUES
+('Toto', 'Dog', 'Cairn Terrier', '2017-05-17', NULL, 'Adopted', '2020-05-30', 175.00, TRUE),            -- 1: Dorothy's dog in The Wizard of Oz.
+('Laika', 'Dog', 'Mixed', '2018-03-02', NULL, 'Adopted', '2020-08-22', 175.00, TRUE),                   -- 2: Real dog, the first animal to orbit Earth.
+('Gromit', 'Dog', 'Beagle', '2019-02-08', NULL, 'Adopted', '2020-10-17', 175.00, TRUE),                 -- 3: Wallace's clever dog in Wallace & Gromit.
+('Balto', 'Dog', 'Siberian Husky', '2019-10-10', NULL, 'Adopted', '2021-03-27', 175.00, TRUE),          -- 4: Real sled dog who helped bring medicine to Nome, Alaska.
+('Lassie', 'Dog', 'Rough Collie', '2019-04-12', NULL, 'Adopted', '2021-12-18', 175.00, TRUE),           -- 5: The loyal collie from books, movies, and TV.
+('Clifford', 'Dog', 'Labrador mix', '2020-12-01', NULL, 'Adopted', '2022-07-09', 175.00, TRUE),         -- 6: The Big Red Dog from the children's books.
+('Hachiko', 'Dog', 'Akita', '2021-11-10', NULL, 'Adopted', '2023-01-28', 175.00, TRUE),                 -- 7: Real Akita in Japan, famous for his loyalty.
+('Pluto', 'Dog', 'Bloodhound', '2020-09-05', NULL, 'Adopted', '2023-04-22', 175.00, TRUE),              -- 8: Mickey Mouse's dog.
+('Odie', 'Dog', 'Beagle mix', '2023-08-08', NULL, 'Adopted', '2025-02-15', 175.00, TRUE),               -- 9: Garfield's dog friend in the comic strip.
+('Snoopy', 'Dog', 'Beagle', '2025-10-04', NULL, 'Pending', '2026-08-29', 250.00, TRUE),                 -- 10: Charlie Brown's beagle in Peanuts.
+('Bluey', 'Dog', 'Australian Cattle Dog', '2025-10-01', NULL, 'Pending', '2026-09-10', 250.00, TRUE),   -- 11: The puppy from the cartoon Bluey.
+('Bolt', 'Dog', 'White Shepherd', '2025-11-21', NULL, 'Pending', '2026-09-11', 250.00, TRUE),           -- 12: The superhero dog from the movie Bolt.
+('Marley', 'Dog', 'Labrador Retriever', '2024-12-25', NULL, 'Pending', '2026-09-17', 175.00, TRUE),     -- 13: The lovable Labrador from Marley & Me.
+('Rin Tin Tin', 'Dog', 'German Shepherd', '2024-09-15', NULL, 'Pending', '2026-09-18', 175.00, TRUE),   -- 14: Real German Shepherd who starred in early movies.
+('Cerberus', 'Dog', 'Rottweiler mix', NULL, 3, 'Pending', '2026-09-19', 175.00, TRUE),                  -- 15: Three-headed guard dog from Greek myth. Birth date unknown, so staff estimated 3 years (Business rule #31).
+('Beethoven', 'Dog', 'Saint Bernard', '2018-04-03', NULL, 'Pending', '2026-09-21', 100.00, TRUE),       -- 16: The giant Saint Bernard from the movie Beethoven.
+('Scooby', 'Dog', 'Great Dane', '2025-09-13', NULL, 'Pending', '2026-09-29', 175.00, TRUE);             -- 17: Scooby-Doo, the mystery-solving Great Dane.
 
 -- Cats (10 cats, IDs 18 to 27): Adopted 18 to 23, Returned 24, Pending 25 and 26, Available 27
 INSERT INTO pets (name, species, breed, birth_date, status, date_added, adoption_fee, vaccinated) VALUES
-('Garfield', 'Cat', 'Orange Tabby', '2018-06-19', 'Adopted', '2020-02-20', 75.00, TRUE),         -- 18: The cat from the comic strip.
-('Cheshire', 'Cat', 'British Shorthair', '2021-11-26', 'Adopted', '2022-10-01', 110.00, TRUE),   -- 19: The grinning cat from Alice in Wonderland.
-('Duchess', 'Cat', 'Turkish Angora', '2021-12-11', 'Adopted', '2023-08-05', 120.00, TRUE),       -- 20: The elegant mother cat from The Aristocats.
-('Salem', 'Cat', 'Black Shorthair', '2022-02-14', 'Adopted', '2023-10-14', 65.00, TRUE),         -- 21: The talking black cat from Sabrina the Teenage Witch.
-('Figaro', 'Cat', 'Tuxedo', '2023-02-07', 'Adopted', '2024-08-24', 90.00, TRUE),                 -- 22: Geppetto's kitten in Pinocchio.
-('Sylvester', 'Cat', 'Tuxedo', '2024-03-24', 'Adopted', '2025-07-26', 85.00, TRUE),              -- 23: The cat who chases Tweety in Looney Tunes.
-('Felix', 'Cat', NULL, '2019-11-09', 'Returned', '2021-01-16', 60.00, TRUE),                     -- 24: Felix the Cat, an early cartoon star. Breed unknown. Returned (Business rule #18).
-('Puss', 'Cat', 'Orange Tabby', '2025-05-05', 'Pending', '2026-09-15', 80.00, TRUE),             -- 25: Puss in Boots, the clever cat from the fairy tale.
-('Crookshanks', 'Cat', 'Persian', '2024-07-08', 'Pending', '2026-09-23', 125.00, TRUE),          -- 26: Hermione's cat in Harry Potter.
-('Tom', 'Cat', 'Russian Blue', '2024-02-10', 'Available', '2025-04-26', 95.00, TRUE);            -- 27: The cat who chases Jerry in Tom and Jerry.
+('Garfield', 'Cat', 'Orange Tabby', '2018-06-19', 'Adopted', '2020-02-20', 100.00, TRUE),        -- 18: The cat from the comic strip.
+('Cheshire', 'Cat', 'British Shorthair', '2021-11-26', 'Adopted', '2022-10-01', 150.00, TRUE),   -- 19: The grinning cat from Alice in Wonderland.
+('Duchess', 'Cat', 'Turkish Angora', '2021-12-11', 'Adopted', '2023-08-05', 100.00, TRUE),       -- 20: The elegant mother cat from The Aristocats.
+('Salem', 'Cat', 'Black Shorthair', '2014-02-14', 'Adopted', '2023-10-14', 50.00, TRUE),         -- 21: The talking black cat from Sabrina the Teenage Witch.
+('Figaro', 'Cat', 'Tuxedo', '2023-02-07', 'Adopted', '2024-08-24', 100.00, TRUE),                -- 22: Geppetto's kitten in Pinocchio.
+('Sylvester', 'Cat', 'Tuxedo', '2024-03-24', 'Adopted', '2025-07-26', 100.00, TRUE),             -- 23: The cat who chases Tweety in Looney Tunes.
+('Felix', 'Cat', NULL, '2019-11-09', 'Returned', '2021-01-16', 100.00, TRUE),                    -- 24: Felix the Cat, an early cartoon star. Breed unknown. Returned (Business rule #18).
+('Puss', 'Cat', 'Orange Tabby', '2025-05-05', 'Pending', '2026-09-15', 100.00, TRUE),            -- 25: Puss in Boots, the clever cat from the fairy tale.
+('Crookshanks', 'Cat', 'Persian', '2024-07-08', 'Pending', '2026-09-23', 100.00, TRUE),          -- 26: Hermione's cat in Harry Potter.
+('Tom', 'Cat', 'Russian Blue', '2024-02-10', 'Available', '2025-04-26', 100.00, TRUE);           -- 27: The cat who chases Jerry in Tom and Jerry.
 
 -- Rabbits (3 rabbits, IDs 28 to 30): Adopted 28, Pending 29, Available 30
 INSERT INTO pets (name, species, breed, birth_date, status, date_added, adoption_fee, vaccinated) VALUES
-('Peter', 'Rabbit', 'Netherland Dwarf', '2023-10-02', 'Adopted', '2024-03-30', 45.00, TRUE),   -- 28: Peter Rabbit from Beatrix Potter's books.
-('Thumper', 'Rabbit', 'Lionhead', '2025-08-13', 'Pending', '2026-01-03', 50.00, TRUE),         -- 29: Bambi's rabbit friend.
-('Bugs', 'Rabbit', 'Dutch', '2025-07-27', 'Available', '2026-06-20', 40.00, FALSE);            -- 30: Bugs Bunny from Looney Tunes. Not vaccinated (Business rule #13 test).
+('Peter', 'Rabbit', 'Netherland Dwarf', '2023-10-02', 'Adopted', '2024-03-30', 75.00, TRUE),   -- 28: Peter Rabbit from Beatrix Potter's books.
+('Thumper', 'Rabbit', 'Lionhead', '2025-08-13', 'Pending', '2026-01-03', 75.00, TRUE),         -- 29: Bambi's rabbit friend.
+('Bugs', 'Rabbit', 'Dutch', '2025-07-27', 'Available', '2026-06-20', 75.00, FALSE);            -- 30: Bugs Bunny from Looney Tunes. Not vaccinated (Business rule #13 test).
 
 -- Birds (4 birds, IDs 31 to 34): Adopted 31 and 32, Pending 33, Available 34
 INSERT INTO pets (name, species, breed, birth_date, status, date_added, adoption_fee, vaccinated) VALUES
-('Woodstock', 'Bird', 'Canary', '2020-06-22', 'Adopted', '2021-09-11', 35.00, TRUE),     -- 31: Snoopy's little bird friend in Peanuts.
-('Iago', 'Bird', 'Scarlet Macaw', '2018-11-25', 'Adopted', '2022-03-19', 80.00, TRUE),   -- 32: The talking parrot from Aladdin.
-('Blu', 'Bird', 'Blue Macaw', '2024-04-15', 'Pending', '2026-09-16', 95.00, TRUE),       -- 33: The blue macaw from the movie Rio.
-('Tweety', 'Bird', 'Canary', '2024-11-21', 'Available', '2025-05-24', 30.00, TRUE);      -- 34: The little yellow bird from Looney Tunes.
+('Woodstock', 'Bird', 'Canary', '2020-06-22', 'Adopted', '2021-09-11', 60.00, TRUE),     -- 31: Snoopy's little bird friend in Peanuts.
+('Iago', 'Bird', 'Scarlet Macaw', '2010-11-25', 'Adopted', '2022-03-19', 30.00, TRUE),   -- 32: The talking parrot from Aladdin.
+('Blu', 'Bird', 'Blue Macaw', '2024-04-15', 'Pending', '2026-09-16', 60.00, TRUE),       -- 33: The blue macaw from the movie Rio.
+('Tweety', 'Bird', 'Canary', '2024-11-21', 'Available', '2025-05-24', 100.00, TRUE);     -- 34: The little yellow bird from Looney Tunes.
 
 -- Other animals (4 other animals, IDs 35 to 38): Adopted 35, Pending 36, Available 37 and 38
 INSERT INTO pets (name, species, breed, birth_date, status, date_added, adoption_fee, vaccinated) VALUES
