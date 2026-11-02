@@ -1,5 +1,4 @@
 -- seed.sql
--- Project: Pet Adoption Management System (CIS 344 Group Project).
 -- Purpose: Fills the pet_adoption database with sample data.
 -- Run schema.sql first, then this file. Safe to run again.
 -- Insert order: employees, pets, adopters, applications.

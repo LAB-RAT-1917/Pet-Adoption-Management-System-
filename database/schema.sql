@@ -1,5 +1,4 @@
 -- schema.sql
--- Project: Pet Adoption Management System (CIS 344 Group Project).
 -- Purpose: Builds the pet_adoption database from scratch.
 -- Table order: employees, pets, adopters, rejection_reasons, applications.
 -- Then three views: pending_applications, approved_applications, rejected_applications.
