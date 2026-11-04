@@ -9,12 +9,11 @@
 //   $errors  = a list of problems to show. An empty list means the form is OK.
 function check_adopter_form(array $form): array
 {
-    $errors = [];                                                    // Problems found so far.
+    $errors = [];
 
-    // Clean up the values. Without this, extra spaces could sneak into the database.
     $adopter = [];
     foreach (["first_name", "last_name", "phone", "email", "address", "date_of_birth"] as $field) {
-        $value = $form[$field] ?? "";                                // What was typed, or "" if the box is missing.
+        $value = $form[$field] ?? "";
         $adopter[$field] = is_string($value) ? trim($value) : "";    // trim removes spaces at the start and end. A list counts as blank.
     }
 
@@ -63,7 +62,7 @@ function check_adopter_form(array $form): array
         }
     }
 
-    return [$adopter, $errors];                                      // Send both back to the page.
+    return [$adopter, $errors];
 }
 
 // 2. CHECK FOR A REPEATED EMAIL (Business rule #7)
@@ -73,7 +72,7 @@ function check_adopter_form(array $form): array
 function email_taken(mysqli $conn, string $email, int $skip_id = 0): bool
 {
     $stmt = $conn->prepare("SELECT COUNT(*) FROM adopters WHERE email = ? AND adopter_id <> ?");
-    $stmt->bind_param("si", $email, $skip_id);                       // s = string, i = whole number.
+    $stmt->bind_param("si", $email, $skip_id);
     $stmt->execute();
-    return $stmt->get_result()->fetch_row()[0] > 0;                  // True if anyone else has it.
+    return $stmt->get_result()->fetch_row()[0] > 0;
 }

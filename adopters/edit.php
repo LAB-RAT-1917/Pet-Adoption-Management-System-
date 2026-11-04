@@ -4,27 +4,25 @@
 // The ID and the date joined never change (Business rule #12).
 
 // 1. CONNECT AND LOAD THE CHECKS
-require_once __DIR__ . "/../includes/db.php";      // The shared connection ($conn).
+require_once __DIR__ . "/../includes/db.php";
 require_once __DIR__ . "/check-adopter.php";       // check_adopter_form() and email_taken(), shared with add.php.
 
 // 2. FIND THE ADOPTER
-// Without this, the page wouldn't know who to edit. The ID comes from the address, like edit.php?id=1.
-// Musicians have negative IDs, like -110989116, so negatives are allowed.
+// The ID comes from the address, like edit.php?id=1. Musicians have negative IDs, like -110989116, so negatives are allowed.
 $id = filter_var($_GET["id"] ?? "", FILTER_VALIDATE_INT);   // A whole number, or false if it isn't one.
 $stmt = $conn->prepare(
     "SELECT adopter_id, first_name, last_name, phone, email, address, date_of_birth, date_joined
      FROM adopters WHERE adopter_id = ?"
 );
-$stmt->bind_param("i", $id);                       // i = whole number.
+$stmt->bind_param("i", $id);
 $stmt->execute();
-$saved = $stmt->get_result()->fetch_assoc();       // The adopter as they are now, or null if there's no one with that ID.
+$saved = $stmt->get_result()->fetch_assoc();       // null if there's no one with that ID.
 
 // 3. START WITH THE SAVED VALUES
-$adopter = $saved;                                 // Fill the form with what's saved.
-$errors  = [];                                     // No problems until the form is sent.
+$adopter = $saved;
+$errors  = [];
 
 // 4. SAVE THE CHANGES WHEN THE FORM IS SENT
-// Without this, clicking "Save changes" would just reload the page.
 if ($saved && $_SERVER["REQUEST_METHOD"] === "POST") {
     [$adopter, $errors] = check_adopter_form($_POST);   // Same checks as the Add page.
 
@@ -32,7 +30,7 @@ if ($saved && $_SERVER["REQUEST_METHOD"] === "POST") {
         $errors[] = "Another adopter already uses that email (Business rule #7).";
     }
 
-    if (!$errors) {                                // Only save when there are no problems.
+    if (!$errors) {
         try {
             $stmt = $conn->prepare(
                 "UPDATE adopters
@@ -41,14 +39,14 @@ if ($saved && $_SERVER["REQUEST_METHOD"] === "POST") {
             );
             $stmt->bind_param("ssssssi",           // s = string, i = whole number.
                 $adopter["first_name"], $adopter["last_name"], $adopter["phone"], $adopter["email"], $adopter["address"], $adopter["date_of_birth"], $id);
-            $stmt->execute();                      // Save the changes.
+            $stmt->execute();
 
-            header("Location: index.php?done=updated");   // Back to the list, which shows "The adopter was updated."
+            header("Location: index.php?done=updated");
             exit;
         } catch (mysqli_sql_exception $e) {
             // 1062 = the email is already used. It can only happen if someone else saved that email at the same moment.
             if ($e->getCode() !== 1062) {
-                die("The adopter couldn't be updated: " . $e->getMessage());   // Any other error is a real problem, so show it.
+                die("The adopter couldn't be updated: " . $e->getMessage());
             }
             $errors[] = "Another adopter already uses that email (Business rule #7).";
         }
@@ -56,11 +54,11 @@ if ($saved && $_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 // 5. SHOW THE PAGE
-$page_title = $saved ? "Edit " . $saved["first_name"] . " " . $saved["last_name"] : "Adopter not found";   // Tab title.
-$active     = "adopters";                          // Highlight Adopters in the menu.
-require_once __DIR__ . "/../includes/header.php";  // Top of the page.
+$page_title = $saved ? "Edit " . $saved["first_name"] . " " . $saved["last_name"] : "Adopter not found";
+$active     = "adopters";
+require_once __DIR__ . "/../includes/header.php";
 ?>
-<?php if (!$saved): ?>                              <!-- Wrong or missing ID in the address. -->
+<?php if (!$saved): ?>
     <h1>Adopter not found</h1>
     <p class="message error">There's no adopter with that ID.</p>
     <p><a href="index.php">Back to the adopter list</a></p>
@@ -73,8 +71,8 @@ require_once __DIR__ . "/../includes/header.php";  // Top of the page.
 
         <div class="form-buttons">
             <button class="button" type="submit">Save changes</button>
-            <a href="index.php">Cancel</a>             <!-- Back to the list, with nothing saved. -->
+            <a href="index.php">Cancel</a>
         </div>
     </form>
 <?php endif; ?>
-<?php require_once __DIR__ . "/../includes/footer.php";   // Bottom of the page. ?>
+<?php require_once __DIR__ . "/../includes/footer.php"; ?>

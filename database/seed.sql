@@ -3,21 +3,20 @@
 -- Run schema.sql first, then this file. Safe to run again.
 -- Insert order: employees, pets, adopters, applications.
 
-USE pet_adoption;                                     -- Pulls the pet_adoption database.
-SET NAMES utf8mb4;                                    -- Read this file as UTF-8, so names like Beyoncé save correctly.
+USE pet_adoption;
+SET NAMES utf8mb4;                                    -- Reads this file as UTF-8, so names like Beyoncé save correctly.
 
 -- 1. CLEAR OLD DATA
--- Empties the tables so this file can run multiple times.
-DELETE FROM applications WHERE application_id > 0;   -- Delete all applications first, because they point to the other three tables (Business rule #17).
-DELETE FROM adopters     WHERE adopter_id <> 0;      -- Delete all adopters. "<> 0" (not 0) matches every ID, even the negative ones. Safe Updates needs a WHERE.
-DELETE FROM pets         WHERE pet_id > 0;           -- Delete all pets, so running this file again won't add them twice.
-DELETE FROM employees    WHERE employee_id > 0;      -- Delete all employees last, because nothing points to them anymore.
--- Without these deletes, a second run would add every row again and stop at the first repeated ID (Error 1062).
+-- Applications are deleted first, because they point to the other three tables (Business rule #17).
+-- "<> 0" matches every adopter ID, even the negative ones. Safe Updates needs a WHERE on every DELETE.
+DELETE FROM applications WHERE application_id > 0;
+DELETE FROM adopters     WHERE adopter_id <> 0;
+DELETE FROM pets         WHERE pet_id > 0;
+DELETE FROM employees    WHERE employee_id > 0;
 
-ALTER TABLE applications AUTO_INCREMENT = 1;         -- Restart application IDs at 1, so they match the rows below.
-ALTER TABLE pets         AUTO_INCREMENT = 1;         -- Restart pet IDs at 1.
--- Without these ALTER TABLEs, new IDs would start where the old ones stopped (pets at 39).
--- So the applications would point to IDs that don't exist.
+-- Restarts the IDs at 1, so the pets and applications get the same IDs on every run.
+ALTER TABLE applications AUTO_INCREMENT = 1;
+ALTER TABLE pets         AUTO_INCREMENT = 1;
 
 
 -- 2. EMPLOYEES
@@ -58,68 +57,64 @@ INSERT INTO employees (employee_id, first_name, last_name, department) VALUES
 (2006, 'Frances',    'Allen',     'Sales');      -- First woman to win the Turing Award, computing's top prize.
 
 
--- 3. PETS (38 pets, grouped by kind: dogs, cats, rabbits, birds, then other animals).
--- Each pet is named after a famous animal from cartoons, books, movies, myths, or real life.
--- What pet_id means: MySQL numbers the pets 1 to 38 in the order they are listed here (Business rule #12).
--- Within each kind, pets are listed by status: Adopted, Returned, Pending, then Available.
--- Inside each status, they are listed in the order they arrived at the store.
--- Each status matches the applications in section 5 (Business rules #8 and #16).
--- Fees follow Business rules #29 to #32. Dogs, cats, rabbits and birds have the set price for their age when they arrived, and other animals' fees were typed.
--- Without these pets, the applications would point to pets that don't exist.
+-- 3. PETS
+-- 38 pets named after famous animals. MySQL numbers them 1 to 38 in the order listed (Business rule #12).
+-- Within each kind, pets are listed Adopted, Returned, Pending, then Available, to match the applications in section 5.
+-- Fees are the set prices for their age on the day they arrived (Business rules #29 to #32).
 
--- Dogs (17 dogs, IDs 1 to 17): Adopted 1 to 9, Pending 10 to 17
--- Only this INSERT lists estimated_age, because Cerberus is the one pet with no birth date. Every other pet's estimate stays NULL (Business rule #31).
+-- Dogs (IDs 1 to 17): Adopted 1 to 9, Pending 10 to 17
+-- Only this INSERT lists estimated_age, because Cerberus is the one pet with no birth date (Business rule #31).
 INSERT INTO pets (name, species, breed, birth_date, estimated_age, status, date_added, adoption_fee, vaccinated) VALUES
-('Toto', 'Dog', 'Cairn Terrier', '2017-05-17', NULL, 'Adopted', '2020-05-30', 175.00, TRUE),            -- 1: Dorothy's dog in The Wizard of Oz.
-('Laika', 'Dog', 'Mixed', '2018-03-02', NULL, 'Adopted', '2020-08-22', 175.00, TRUE),                   -- 2: Real dog, the first animal to orbit Earth.
-('Gromit', 'Dog', 'Beagle', '2019-02-08', NULL, 'Adopted', '2020-10-17', 175.00, TRUE),                 -- 3: Wallace's clever dog in Wallace & Gromit.
-('Balto', 'Dog', 'Siberian Husky', '2019-10-10', NULL, 'Adopted', '2021-03-27', 175.00, TRUE),          -- 4: Real sled dog who helped bring medicine to Nome, Alaska.
-('Lassie', 'Dog', 'Rough Collie', '2019-04-12', NULL, 'Adopted', '2021-12-18', 175.00, TRUE),           -- 5: The loyal collie from books, movies, and TV.
-('Clifford', 'Dog', 'Labrador mix', '2020-12-01', NULL, 'Adopted', '2022-07-09', 175.00, TRUE),         -- 6: The Big Red Dog from the children's books.
-('Hachiko', 'Dog', 'Akita', '2021-11-10', NULL, 'Adopted', '2023-01-28', 175.00, TRUE),                 -- 7: Real Akita in Japan, famous for his loyalty.
-('Pluto', 'Dog', 'Bloodhound', '2020-09-05', NULL, 'Adopted', '2023-04-22', 175.00, TRUE),              -- 8: Mickey Mouse's dog.
-('Odie', 'Dog', 'Beagle mix', '2023-08-08', NULL, 'Adopted', '2025-02-15', 175.00, TRUE),               -- 9: Garfield's dog friend in the comic strip.
-('Snoopy', 'Dog', 'Beagle', '2025-10-04', NULL, 'Pending', '2026-08-29', 250.00, TRUE),                 -- 10: Charlie Brown's beagle in Peanuts.
-('Bluey', 'Dog', 'Australian Cattle Dog', '2025-10-01', NULL, 'Pending', '2026-09-10', 250.00, TRUE),   -- 11: The puppy from the cartoon Bluey.
-('Bolt', 'Dog', 'White Shepherd', '2025-11-21', NULL, 'Pending', '2026-09-11', 250.00, TRUE),           -- 12: The superhero dog from the movie Bolt.
-('Marley', 'Dog', 'Labrador Retriever', '2024-12-25', NULL, 'Pending', '2026-09-17', 175.00, TRUE),     -- 13: The lovable Labrador from Marley & Me.
-('Rin Tin Tin', 'Dog', 'German Shepherd', '2024-09-15', NULL, 'Pending', '2026-09-18', 175.00, TRUE),   -- 14: Real German Shepherd who starred in early movies.
-('Cerberus', 'Dog', 'Rottweiler mix', NULL, 3, 'Pending', '2026-09-19', 175.00, TRUE),                  -- 15: Three-headed guard dog from Greek myth. Birth date unknown, so staff estimated 3 years (Business rule #31).
-('Beethoven', 'Dog', 'Saint Bernard', '2018-04-03', NULL, 'Pending', '2026-09-21', 100.00, TRUE),       -- 16: The giant Saint Bernard from the movie Beethoven.
-('Scooby', 'Dog', 'Great Dane', '2025-09-13', NULL, 'Pending', '2026-09-29', 175.00, TRUE);             -- 17: Scooby-Doo, the mystery-solving Great Dane.
+('Toto', 'Dog', 'Cairn Terrier', '2017-05-17', NULL, 'Adopted', '2020-05-30', 175.00, TRUE),
+('Laika', 'Dog', 'Mixed', '2018-03-02', NULL, 'Adopted', '2020-08-22', 175.00, TRUE),
+('Gromit', 'Dog', 'Beagle', '2019-02-08', NULL, 'Adopted', '2020-10-17', 175.00, TRUE),
+('Balto', 'Dog', 'Siberian Husky', '2019-10-10', NULL, 'Adopted', '2021-03-27', 175.00, TRUE),
+('Lassie', 'Dog', 'Rough Collie', '2019-04-12', NULL, 'Adopted', '2021-12-18', 175.00, TRUE),
+('Clifford', 'Dog', 'Labrador mix', '2020-12-01', NULL, 'Adopted', '2022-07-09', 175.00, TRUE),
+('Hachiko', 'Dog', 'Akita', '2021-11-10', NULL, 'Adopted', '2023-01-28', 175.00, TRUE),
+('Pluto', 'Dog', 'Bloodhound', '2020-09-05', NULL, 'Adopted', '2023-04-22', 175.00, TRUE),
+('Odie', 'Dog', 'Beagle mix', '2023-08-08', NULL, 'Adopted', '2025-02-15', 175.00, TRUE),
+('Snoopy', 'Dog', 'Beagle', '2025-10-04', NULL, 'Pending', '2026-08-29', 250.00, TRUE),
+('Bluey', 'Dog', 'Australian Cattle Dog', '2025-10-01', NULL, 'Pending', '2026-09-10', 250.00, TRUE),
+('Bolt', 'Dog', 'White Shepherd', '2025-11-21', NULL, 'Pending', '2026-09-11', 250.00, TRUE),
+('Marley', 'Dog', 'Labrador Retriever', '2024-12-25', NULL, 'Pending', '2026-09-17', 175.00, TRUE),
+('Rin Tin Tin', 'Dog', 'German Shepherd', '2024-09-15', NULL, 'Pending', '2026-09-18', 175.00, TRUE),
+('Cerberus', 'Dog', 'Rottweiler mix', NULL, 3, 'Pending', '2026-09-19', 175.00, TRUE),   -- No birth date, so staff estimated 3 years (Business rule #31).
+('Beethoven', 'Dog', 'Saint Bernard', '2018-04-03', NULL, 'Pending', '2026-09-21', 100.00, TRUE),
+('Scooby', 'Dog', 'Great Dane', '2025-09-13', NULL, 'Pending', '2026-09-29', 175.00, TRUE);
 
--- Cats (10 cats, IDs 18 to 27): Adopted 18 to 23, Returned 24, Pending 25 and 26, Available 27
+-- Cats (IDs 18 to 27): Adopted 18 to 23, Returned 24, Pending 25 and 26, Available 27
 INSERT INTO pets (name, species, breed, birth_date, status, date_added, adoption_fee, vaccinated) VALUES
-('Garfield', 'Cat', 'Orange Tabby', '2018-06-19', 'Adopted', '2020-02-20', 100.00, TRUE),        -- 18: The cat from the comic strip.
-('Cheshire', 'Cat', 'British Shorthair', '2021-11-26', 'Adopted', '2022-10-01', 150.00, TRUE),   -- 19: The grinning cat from Alice in Wonderland.
-('Duchess', 'Cat', 'Turkish Angora', '2021-12-11', 'Adopted', '2023-08-05', 100.00, TRUE),       -- 20: The elegant mother cat from The Aristocats.
-('Salem', 'Cat', 'Black Shorthair', '2014-02-14', 'Adopted', '2023-10-14', 50.00, TRUE),         -- 21: The talking black cat from Sabrina the Teenage Witch.
-('Figaro', 'Cat', 'Tuxedo', '2023-02-07', 'Adopted', '2024-08-24', 100.00, TRUE),                -- 22: Geppetto's kitten in Pinocchio.
-('Sylvester', 'Cat', 'Tuxedo', '2024-03-24', 'Adopted', '2025-07-26', 100.00, TRUE),             -- 23: The cat who chases Tweety in Looney Tunes.
-('Felix', 'Cat', NULL, '2019-11-09', 'Returned', '2021-01-16', 100.00, TRUE),                    -- 24: Felix the Cat, an early cartoon star. Breed unknown. Returned (Business rule #18).
-('Puss', 'Cat', 'Orange Tabby', '2025-05-05', 'Pending', '2026-09-15', 100.00, TRUE),            -- 25: Puss in Boots, the clever cat from the fairy tale.
-('Crookshanks', 'Cat', 'Persian', '2024-07-08', 'Pending', '2026-09-23', 100.00, TRUE),          -- 26: Hermione's cat in Harry Potter.
-('Tom', 'Cat', 'Russian Blue', '2024-02-10', 'Available', '2025-04-26', 100.00, TRUE);           -- 27: The cat who chases Jerry in Tom and Jerry.
+('Garfield', 'Cat', 'Orange Tabby', '2018-06-19', 'Adopted', '2020-02-20', 100.00, TRUE),
+('Cheshire', 'Cat', 'British Shorthair', '2021-11-26', 'Adopted', '2022-10-01', 150.00, TRUE),
+('Duchess', 'Cat', 'Turkish Angora', '2021-12-11', 'Adopted', '2023-08-05', 100.00, TRUE),
+('Salem', 'Cat', 'Black Shorthair', '2014-02-14', 'Adopted', '2023-10-14', 50.00, TRUE),
+('Figaro', 'Cat', 'Tuxedo', '2023-02-07', 'Adopted', '2024-08-24', 100.00, TRUE),
+('Sylvester', 'Cat', 'Tuxedo', '2024-03-24', 'Adopted', '2025-07-26', 100.00, TRUE),
+('Felix', 'Cat', NULL, '2019-11-09', 'Returned', '2021-01-16', 100.00, TRUE),   -- Breed unknown. Returned by its adopter (Business rule #18).
+('Puss', 'Cat', 'Orange Tabby', '2025-05-05', 'Pending', '2026-09-15', 100.00, TRUE),
+('Crookshanks', 'Cat', 'Persian', '2024-07-08', 'Pending', '2026-09-23', 100.00, TRUE),
+('Tom', 'Cat', 'Russian Blue', '2024-02-10', 'Available', '2025-04-26', 100.00, TRUE);
 
--- Rabbits (3 rabbits, IDs 28 to 30): Adopted 28, Pending 29, Available 30
+-- Rabbits (IDs 28 to 30): Adopted 28, Pending 29, Available 30
 INSERT INTO pets (name, species, breed, birth_date, status, date_added, adoption_fee, vaccinated) VALUES
-('Peter', 'Rabbit', 'Netherland Dwarf', '2023-10-02', 'Adopted', '2024-03-30', 75.00, TRUE),   -- 28: Peter Rabbit from Beatrix Potter's books.
-('Thumper', 'Rabbit', 'Lionhead', '2025-08-13', 'Pending', '2026-01-03', 75.00, TRUE),         -- 29: Bambi's rabbit friend.
-('Bugs', 'Rabbit', 'Dutch', '2025-07-27', 'Available', '2026-06-20', 75.00, FALSE);            -- 30: Bugs Bunny from Looney Tunes. Not vaccinated (Business rule #13 test).
+('Peter', 'Rabbit', 'Netherland Dwarf', '2023-10-02', 'Adopted', '2024-03-30', 75.00, TRUE),
+('Thumper', 'Rabbit', 'Lionhead', '2025-08-13', 'Pending', '2026-01-03', 75.00, TRUE),
+('Bugs', 'Rabbit', 'Dutch', '2025-07-27', 'Available', '2026-06-20', 75.00, FALSE);   -- Not vaccinated, to test Business rule #13.
 
--- Birds (4 birds, IDs 31 to 34): Adopted 31 and 32, Pending 33, Available 34
+-- Birds (IDs 31 to 34): Adopted 31 and 32, Pending 33, Available 34
 INSERT INTO pets (name, species, breed, birth_date, status, date_added, adoption_fee, vaccinated) VALUES
-('Woodstock', 'Bird', 'Canary', '2020-06-22', 'Adopted', '2021-09-11', 60.00, TRUE),     -- 31: Snoopy's little bird friend in Peanuts.
-('Iago', 'Bird', 'Scarlet Macaw', '2010-11-25', 'Adopted', '2022-03-19', 30.00, TRUE),   -- 32: The talking parrot from Aladdin.
-('Blu', 'Bird', 'Blue Macaw', '2024-04-15', 'Pending', '2026-09-16', 60.00, TRUE),       -- 33: The blue macaw from the movie Rio.
-('Tweety', 'Bird', 'Canary', '2024-11-21', 'Available', '2025-05-24', 100.00, TRUE);     -- 34: The little yellow bird from Looney Tunes.
+('Woodstock', 'Bird', 'Canary', '2020-06-22', 'Adopted', '2021-09-11', 60.00, TRUE),
+('Iago', 'Bird', 'Scarlet Macaw', '2010-11-25', 'Adopted', '2022-03-19', 30.00, TRUE),
+('Blu', 'Bird', 'Blue Macaw', '2024-04-15', 'Pending', '2026-09-16', 60.00, TRUE),
+('Tweety', 'Bird', 'Canary', '2024-11-21', 'Available', '2025-05-24', 100.00, TRUE);
 
--- Other animals (4 other animals, IDs 35 to 38): Adopted 35, Pending 36, Available 37 and 38
+-- Other animals (IDs 35 to 38): Adopted 35, Pending 36, Available 37 and 38
 INSERT INTO pets (name, species, breed, birth_date, status, date_added, adoption_fee, vaccinated) VALUES
-('Nemo', 'Other', 'Clownfish', '2020-05-30', 'Adopted', '2021-07-03', 15.00, TRUE),     -- 35: The clownfish from Finding Nemo.
-('Stuart', 'Other', 'Mouse', '2026-03-15', 'Pending', '2026-09-12', 10.00, TRUE),       -- 36: Stuart Little, the mouse from the children's book.
-('Dory', 'Other', 'Blue Tang', '2023-06-17', 'Available', '2024-05-18', 20.00, TRUE),   -- 37: The forgetful blue tang from Finding Nemo.
-('Fenrir', 'Other', 'Ferret', '2025-01-15', 'Available', '2026-08-15', 55.00, FALSE);   -- 38: Named after the giant wolf in Norse myth. Not vaccinated (Business rule #13 test).
+('Nemo', 'Other', 'Clownfish', '2020-05-30', 'Adopted', '2021-07-03', 15.00, TRUE),
+('Stuart', 'Other', 'Mouse', '2026-03-15', 'Pending', '2026-09-12', 10.00, TRUE),
+('Dory', 'Other', 'Blue Tang', '2023-06-17', 'Available', '2024-05-18', 20.00, TRUE),
+('Fenrir', 'Other', 'Ferret', '2025-01-15', 'Available', '2026-08-15', 55.00, FALSE);   -- Not vaccinated, to test Business rule #13.
 
 -- 4. ADOPTERS (29 people in two parts: 16 historical figures and 13 musicians)
 -- What adopter_id means: the store types in every ID.
@@ -189,110 +184,104 @@ INSERT INTO adopters (adopter_id, first_name, last_name, phone, email, address, 
 INSERT INTO adopters (adopter_id, first_name, last_name, phone, email, address, date_of_birth, date_joined) VALUES
 (-51308861, 'Elton', 'John', '(310) 865-1000', 'elton.john@interscoperecords.rock', '2220 Colorado Ave, Santa Monica, CA 90404', '1947-03-25', '1968-03-01');   -- Rock star who started the Elton John AIDS Foundation.
 
--- 5. APPLICATIONS (51 applications, grouped by status: Approved, Pending, Rejected)
--- What application_id means: MySQL numbers them 1 to 51 in the order they are listed here (Business rule #12).
--- Each application links an adopter, a pet and the Adoption employee who handled it (Business rules #1, #3 and #20).
--- Every Rejected application has a reason from rejection_reasons. The others have NULL (Business rule #25).
--- Without these applications, every join between adopters, pets and employees would come back empty.
+-- 5. APPLICATIONS
+-- 51 applications are grouped by status. MySQL numbers them 1 to 51 in the order listed (Business rule #12).
+-- Only Rejected applications have a reason ID from rejection_reasons (Business rule #25).
 
--- Approved (20, IDs 1 to 20): staff said yes, so the pet became Adopted (Business rule #16).
+-- Approved (IDs 1 to 20). Staff said yes, so the pet became Adopted (Business rule #16).
 INSERT INTO applications (adopter_id, pet_id, employee_id, application_date, status, rejection_reason_id) VALUES
-(         1, 18, 1843, '2020-03-14 10:30:00', 'Approved', NULL),   -- 1: Bob Ross adopted Garfield.
-(         2,  1, 1936, '2020-06-20 11:15:00', 'Approved', NULL),   -- 2: Christa McAuliffe adopted Toto.
-(         3,  2, 1946, '2020-09-12 14:00:00', 'Approved', NULL),   -- 3: Sally Ride adopted Laika.
-(         4,  3, 1948, '2020-11-07 13:45:00', 'Approved', NULL),   -- 4: Jim Henson adopted Gromit.
-(         6, 24, 1955, '2021-02-06 10:00:00', 'Approved', NULL),   -- 5: Paul Farmer adopted Felix. Returned later (Business rule #18).
-(         7,  4, 1957, '2021-04-17 15:20:00', 'Approved', NULL),   -- 6: Roberto Clemente adopted Balto.
-(         8, 35, 1958, '2021-07-24 12:10:00', 'Approved', NULL),   -- 7: Steve Irwin adopted Nemo.
-(         9, 31, 1963, '2021-10-02 09:40:00', 'Approved', NULL),   -- 8: Wangari Maathai adopted Woodstock.
-(        10,  5, 1970, '2022-01-15 16:05:00', 'Approved', NULL),   -- 9: Christopher Reeve adopted Lassie.
-(        11, 32, 1972, '2022-04-09 11:50:00', 'Approved', NULL),   -- 10: Chico Mendes adopted Iago.
-(-101133786,  6, 1981, '2022-07-30 14:25:00', 'Approved', NULL),   -- 11: Lady Gaga adopted Clifford.
-(        12, 19, 1843, '2022-10-22 13:10:00', 'Approved', NULL),   -- 12: Selena Quintanilla adopted Cheshire.
-(        13,  7, 1936, '2023-02-18 10:55:00', 'Approved', NULL),   -- 13: John Lewis adopted Hachiko.
-( -51308861,  8, 1946, '2023-05-13 15:30:00', 'Approved', NULL),   -- 14: Elton John adopted Pluto.
-( -62962352, 20, 1947, '2023-08-26 12:40:00', 'Approved', NULL),   -- 15: Beyoncé adopted Duchess.
-(         5, 21, 1948, '2023-11-04 11:20:00', 'Approved', NULL),   -- 16: Chadwick Boseman adopted Salem.
-( -23198483, 28, 1952, '2024-04-20 14:15:00', 'Approved', NULL),   -- 17: Dolly Parton adopted Peter.
-(-110989116, 22, 1957, '2024-09-14 10:35:00', 'Approved', NULL),   -- 18: Justin Bieber adopted Figaro.
-( -92703326,  9, 1958, '2025-03-08 16:00:00', 'Approved', NULL),   -- 19: Ariana Grande adopted Odie.
-( -87947363, 23, 1972, '2025-08-16 13:30:00', 'Approved', NULL);   -- 20: Shakira adopted Sylvester.
+(         1, 18, 1843, '2020-03-14 10:30:00', 'Approved', NULL),
+(         2,  1, 1936, '2020-06-20 11:15:00', 'Approved', NULL),
+(         3,  2, 1946, '2020-09-12 14:00:00', 'Approved', NULL),
+(         4,  3, 1948, '2020-11-07 13:45:00', 'Approved', NULL),
+(         6, 24, 1955, '2021-02-06 10:00:00', 'Approved', NULL),   -- Felix was returned later (Business rule #18).
+(         7,  4, 1957, '2021-04-17 15:20:00', 'Approved', NULL),
+(         8, 35, 1958, '2021-07-24 12:10:00', 'Approved', NULL),
+(         9, 31, 1963, '2021-10-02 09:40:00', 'Approved', NULL),
+(        10,  5, 1970, '2022-01-15 16:05:00', 'Approved', NULL),
+(        11, 32, 1972, '2022-04-09 11:50:00', 'Approved', NULL),
+(-101133786,  6, 1981, '2022-07-30 14:25:00', 'Approved', NULL),
+(        12, 19, 1843, '2022-10-22 13:10:00', 'Approved', NULL),
+(        13,  7, 1936, '2023-02-18 10:55:00', 'Approved', NULL),
+( -51308861,  8, 1946, '2023-05-13 15:30:00', 'Approved', NULL),
+( -62962352, 20, 1947, '2023-08-26 12:40:00', 'Approved', NULL),
+(         5, 21, 1948, '2023-11-04 11:20:00', 'Approved', NULL),
+( -23198483, 28, 1952, '2024-04-20 14:15:00', 'Approved', NULL),
+(-110989116, 22, 1957, '2024-09-14 10:35:00', 'Approved', NULL),
+( -92703326,  9, 1958, '2025-03-08 16:00:00', 'Approved', NULL),
+( -87947363, 23, 1972, '2025-08-16 13:30:00', 'Approved', NULL);
 
--- Pending (13, IDs 21 to 33): waiting for staff review.
+-- Pending (IDs 21 to 33), waiting for staff review.
 INSERT INTO applications (adopter_id, pet_id, employee_id, application_date, status, rejection_reason_id) VALUES
-(         8, 11, 1947, '2026-10-01 10:15:00', 'Pending',  NULL),   -- 21: Steve Irwin wants Bluey.
-( -70633063, 12, 1948, '2026-10-02 11:40:00', 'Pending',  NULL),   -- 22: Kanye West wants Bolt.
-( -87266657, 36, 1949, '2026-10-03 14:05:00', 'Pending',  NULL),   -- 23: Michael Jackson wants Stuart.
-(         6, 10, 1955, '2026-10-05 09:50:00', 'Pending',  NULL),   -- 24: Paul Farmer wants Snoopy.
-(         5, 25, 1957, '2026-10-06 15:35:00', 'Pending',  NULL),   -- 25: Chadwick Boseman wants Puss.
-(         9, 33, 1958, '2026-10-07 10:25:00', 'Pending',  NULL),   -- 26: Wangari Maathai wants Blu.
-(        14, 13, 1970, '2026-10-08 13:15:00', 'Pending',  NULL),   -- 27: Martin Luther King Jr. wants Marley.
-( -48390856, 14, 1972, '2026-10-09 12:00:00', 'Pending',  NULL),   -- 28: Tate McRae wants Rin Tin Tin.
-( -47257785, 15, 1976, '2026-10-10 16:20:00', 'Pending',  NULL),   -- 29: Lil Wayne wants Cerberus.
-( -92703326, 16, 1843, '2026-10-12 11:05:00', 'Pending',  NULL),   -- 30: Ariana Grande wants Beethoven.
-( -72023925, 26, 1936, '2026-10-14 14:45:00', 'Pending',  NULL),   -- 31: Olivia Rodrigo wants Crookshanks.
-(         2, 29, 1947, '2026-10-16 10:40:00', 'Pending',  NULL),   -- 32: Christa McAuliffe wants Thumper.
-(         1, 17, 1949, '2026-10-20 15:10:00', 'Pending',  NULL);   -- 33: Bob Ross wants Scooby.
+(         8, 11, 1947, '2026-10-01 10:15:00', 'Pending',  NULL),
+( -70633063, 12, 1948, '2026-10-02 11:40:00', 'Pending',  NULL),
+( -87266657, 36, 1949, '2026-10-03 14:05:00', 'Pending',  NULL),
+(         6, 10, 1955, '2026-10-05 09:50:00', 'Pending',  NULL),
+(         5, 25, 1957, '2026-10-06 15:35:00', 'Pending',  NULL),
+(         9, 33, 1958, '2026-10-07 10:25:00', 'Pending',  NULL),
+(        14, 13, 1970, '2026-10-08 13:15:00', 'Pending',  NULL),
+( -48390856, 14, 1972, '2026-10-09 12:00:00', 'Pending',  NULL),
+( -47257785, 15, 1976, '2026-10-10 16:20:00', 'Pending',  NULL),
+( -92703326, 16, 1843, '2026-10-12 11:05:00', 'Pending',  NULL),
+( -72023925, 26, 1936, '2026-10-14 14:45:00', 'Pending',  NULL),
+(         2, 29, 1947, '2026-10-16 10:40:00', 'Pending',  NULL),
+(         1, 17, 1949, '2026-10-20 15:10:00', 'Pending',  NULL);
 
--- Rejected (18, IDs 34 to 51), grouped by reason:
+-- Rejected (IDs 34 to 51), grouped by reason:
 --   under 18: 34 to 36, not vaccinated: 37 to 39, already adopted: 40 to 42, pet has a pending application: 43 to 45,
 --   pet returned: 46, adopter has a pending application: 47 and 48, home visit: 49 and 50, landlord: 51.
 INSERT INTO applications (adopter_id, pet_id, employee_id, application_date, status, rejection_reason_id) VALUES
-( -48390856,  3, 1947, '2020-10-24 11:00:00', 'Rejected', 1),   -- 34: Tate McRae for Gromit at 17. Adopter is under 18 (Business rule #14).
-( -72023925, 24, 1952, '2021-01-23 13:30:00', 'Rejected', 1),   -- 35: Olivia Rodrigo for Felix at 17. Adopter is under 18 (Business rule #14).
-( -43861024, 34, 1970, '2025-06-14 15:00:00', 'Rejected', 1),   -- 36: One Direction for Tweety at 14. Adopter is under 18 (Business rule #14).
-(        11, 30, 1843, '2026-07-11 10:05:00', 'Rejected', 2),   -- 37: Chico Mendes for Bugs. Pet is not vaccinated (Business rule #13).
-(         1, 30, 1936, '2026-08-22 16:15:00', 'Rejected', 2),   -- 38: Bob Ross for Bugs. Pet is not vaccinated (Business rule #13).
-( -87947363, 38, 1946, '2026-09-05 13:40:00', 'Rejected', 2),   -- 39: Shakira for Fenrir. Pet is not vaccinated (Business rule #13).
-(         5, 18, 1949, '2021-01-09 12:30:00', 'Rejected', 3),   -- 40: Chadwick Boseman for Garfield. Pet is already adopted (Business rule #13).
-(         9,  1, 1976, '2022-05-28 14:50:00', 'Rejected', 3),   -- 41: Wangari Maathai for Toto. Pet is already adopted (Business rule #13).
-(        10,  7, 1949, '2024-01-13 11:10:00', 'Rejected', 3),   -- 42: Christopher Reeve for Hachiko. Pet is already adopted (Business rule #13).
-(         1, 11, 1952, '2026-10-04 14:35:00', 'Rejected', 4),   -- 43: Bob Ross for Bluey. Pet already has a pending application (Business rule #13).
-(         2, 10, 1981, '2026-10-11 15:55:00', 'Rejected', 4),   -- 44: Christa McAuliffe for Snoopy. Pet already has a pending application (Business rule #13).
-(        11, 12, 1946, '2026-10-15 10:30:00', 'Rejected', 4),   -- 45: Chico Mendes for Bolt. Pet already has a pending application (Business rule #13).
-(        13, 24, 1981, '2026-06-06 14:20:00', 'Rejected', 5),   -- 46: John Lewis for Felix. Pet was returned and is still in care (Business rule #13).
-(         8, 13, 1963, '2026-10-07 12:50:00', 'Rejected', 6),   -- 47: Steve Irwin for Marley. Adopter already has a pending application (Business rule #15).
-( -70633063, 27, 1948, '2026-10-18 13:05:00', 'Rejected', 6),   -- 48: Kanye West for Tom. Adopter already has a pending application (Business rule #15).
-(         7, 37, 1955, '2024-06-08 13:20:00', 'Rejected', 7),   -- 49: Roberto Clemente for Dory. Did not pass the home visit (Business rule #26).
-(         3, 27, 1963, '2025-05-17 10:45:00', 'Rejected', 7),   -- 50: Sally Ride for Tom. Did not pass the home visit (Business rule #26).
-(        12, 29, 1976, '2026-01-24 12:15:00', 'Rejected', 8);   -- 51: Selena Quintanilla for Thumper. Landlord does not allow pets (Business rule #27).
+( -48390856,  3, 1947, '2020-10-24 11:00:00', 'Rejected', 1),
+( -72023925, 24, 1952, '2021-01-23 13:30:00', 'Rejected', 1),
+( -43861024, 34, 1970, '2025-06-14 15:00:00', 'Rejected', 1),
+(        11, 30, 1843, '2026-07-11 10:05:00', 'Rejected', 2),
+(         1, 30, 1936, '2026-08-22 16:15:00', 'Rejected', 2),
+( -87947363, 38, 1946, '2026-09-05 13:40:00', 'Rejected', 2),
+(         5, 18, 1949, '2021-01-09 12:30:00', 'Rejected', 3),
+(         9,  1, 1976, '2022-05-28 14:50:00', 'Rejected', 3),
+(        10,  7, 1949, '2024-01-13 11:10:00', 'Rejected', 3),
+(         1, 11, 1952, '2026-10-04 14:35:00', 'Rejected', 4),
+(         2, 10, 1981, '2026-10-11 15:55:00', 'Rejected', 4),
+(        11, 12, 1946, '2026-10-15 10:30:00', 'Rejected', 4),
+(        13, 24, 1981, '2026-06-06 14:20:00', 'Rejected', 5),
+(         8, 13, 1963, '2026-10-07 12:50:00', 'Rejected', 6),
+( -70633063, 27, 1948, '2026-10-18 13:05:00', 'Rejected', 6),
+(         7, 37, 1955, '2024-06-08 13:20:00', 'Rejected', 7),
+(         3, 27, 1963, '2025-05-17 10:45:00', 'Rejected', 7),
+(        12, 29, 1976, '2026-01-24 12:15:00', 'Rejected', 8);
 
--- 6. QUICK CHECK (five SELECTs that show everything loaded the right way)
--- Each SELECT opens its own result tab. Compare each one with the "Expected" line above it.
--- Without these checks, a missing or doubled row could go unnoticed until the app shows the wrong data.
+-- 6. QUICK CHECK
+-- Each SELECT opens its own result tab. Compare it with the Expected line above it.
 
--- How many rows each table has.
--- Expected: employees 24, pets 38, adopters 29, applications 51, rejection_reasons 8.
-SELECT 'employees' AS table_name, COUNT(*) AS row_count FROM employees   -- Count the employees.
-UNION ALL SELECT 'pets',              COUNT(*) FROM pets                 -- Add the pet count as the next row.
-UNION ALL SELECT 'adopters',          COUNT(*) FROM adopters             -- Add the adopter count.
-UNION ALL SELECT 'applications',      COUNT(*) FROM applications         -- Add the application count.
-UNION ALL SELECT 'rejection_reasons', COUNT(*) FROM rejection_reasons;   -- Add the reason count (schema.sql adds these 8).
+-- Rows in each table. Expected: employees 24, pets 38, adopters 29, applications 51, rejection_reasons 8.
+SELECT 'employees' AS table_name, COUNT(*) AS row_count FROM employees
+UNION ALL SELECT 'pets',              COUNT(*) FROM pets
+UNION ALL SELECT 'adopters',          COUNT(*) FROM adopters
+UNION ALL SELECT 'applications',      COUNT(*) FROM applications
+UNION ALL SELECT 'rejection_reasons', COUNT(*) FROM rejection_reasons;
 
--- How many applications have each status.
--- Expected: Approved 20, Pending 13, Rejected 18.
-SELECT status, COUNT(*) AS how_many                          -- Show each status and how many applications have it.
-FROM applications                                            -- Look in the applications table.
-GROUP BY status                                              -- Put applications with the same status together.
-ORDER BY FIELD(status, 'Approved', 'Pending', 'Rejected');   -- List them in the same order as section 5.
+-- Applications by status. Expected: Approved 20, Pending 13, Rejected 18.
+SELECT status, COUNT(*) AS how_many
+FROM applications
+GROUP BY status
+ORDER BY FIELD(status, 'Approved', 'Pending', 'Rejected');
 
--- How many pets have each status. They should match the applications above (Business rule #16).
+-- Pets by status. They must match the applications above (Business rule #16).
 -- Expected: Adopted 19 and Returned 1 (the 20 Approved), Pending 13 (the 13 Pending), Available 5.
-SELECT status, COUNT(*) AS how_many                                      -- Show each pet status and how many pets have it.
-FROM pets                                                                -- Look in the pets table.
-GROUP BY status                                                          -- Put pets with the same status together.
-ORDER BY FIELD(status, 'Adopted', 'Returned', 'Pending', 'Available');   -- List them in the same order as section 3.
+SELECT status, COUNT(*) AS how_many
+FROM pets
+GROUP BY status
+ORDER BY FIELD(status, 'Adopted', 'Returned', 'Pending', 'Available');
 
--- Why the 18 applications were rejected, and the rule each one broke (Business rule #25).
+-- Rejections by reason (Business rule #25). LEFT JOIN keeps a reason even if no application used it.
 -- Expected how_many for reason IDs 1 to 8: 3, 3, 3, 3, 1, 2, 2, 1.
-SELECT r.reason_id, r.reason, r.rule_number, COUNT(a.application_id) AS how_many   -- Show each reason, its rule, and how many applications it rejected.
-FROM rejection_reasons r                                                           -- Start from the list of reasons (r is a short name for the table).
-LEFT JOIN applications a ON a.rejection_reason_id = r.reason_id                    -- Match each reason to its applications. LEFT JOIN keeps a reason even if nothing used it.
-GROUP BY r.reason_id, r.reason, r.rule_number                                      -- One row per reason.
-ORDER BY r.reason_id;                                                              -- List them by reason ID.
+SELECT r.reason_id, r.reason, r.rule_number, COUNT(a.application_id) AS how_many
+FROM rejection_reasons r
+LEFT JOIN applications a ON a.rejection_reason_id = r.reason_id
+GROUP BY r.reason_id, r.reason, r.rule_number
+ORDER BY r.reason_id;
 
--- The three views from schema.sql. Each one should match its status count above.
--- Expected: pending 13, approved 20, rejected 18.
-SELECT (SELECT COUNT(*) FROM pending_applications)  AS pending,    -- Count the rows in the pending view.
-       (SELECT COUNT(*) FROM approved_applications) AS approved,   -- Count the rows in the approved view.
-       (SELECT COUNT(*) FROM rejected_applications) AS rejected;   -- Count the rows in the rejected view.
+-- The three views. Expected: pending 13, approved 20, rejected 18.
+SELECT (SELECT COUNT(*) FROM pending_applications)  AS pending,
+       (SELECT COUNT(*) FROM approved_applications) AS approved,
+       (SELECT COUNT(*) FROM rejected_applications) AS rejected;

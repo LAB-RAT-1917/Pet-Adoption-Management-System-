@@ -3,9 +3,9 @@
 // Purpose: The error box and adopter fields that add.php and edit.php share, so both forms look and work the same.
 // The page that loads this file must set $adopter (the values to show) and $errors (the problems to show).
 ?>
-<p class="note"><span class="required">*</span> Required (Business rule #6)</p>   <!-- Tells staff what the red stars mean. -->
+<p class="note"><span class="required">*</span> Required (Business rule #6)</p>
 
-<?php if ($errors): ?>                              <!-- Only shows when something needs fixing. -->
+<?php if ($errors): ?>
     <div class="message error">
         <p>Please fix these:</p>
         <ul>
@@ -30,7 +30,7 @@
 
 <label for="email">Email <span class="required">*</span></label>
 <input id="email" name="email" type="email" maxlength="100" required placeholder="name@example.com"
-       value="<?= htmlspecialchars($adopter["email"]) ?>">   <!-- No two adopters can share an email (Business rule #7). -->
+       value="<?= htmlspecialchars($adopter["email"]) ?>">
 
 <label for="address">Address <span class="required">*</span></label>
 <input id="address" name="address" maxlength="150" required placeholder="Street, city, state and zip code"
