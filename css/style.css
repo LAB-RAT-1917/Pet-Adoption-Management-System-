@@ -178,3 +178,12 @@ input[readonly], input:disabled { background: #eeeeee; color: #444444; }   /* Gr
     font-size: 0.9rem;
     padding: 24px 16px;
 }
+
+/* 9. APPLICATIONS PAGES (the Pending / Approved / Rejected / New tabs, and the Approve and Reject column) */
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; border-bottom: 2px solid var(--line); }
+.tabs a { padding: 8px 14px; text-decoration: none; color: var(--brand); border-radius: 6px 6px 0 0; }
+.tabs a:hover { background: #eef4f3; }
+.tabs a.active { background: var(--brand); color: #ffffff; }
+.decision { min-width: 260px; }
+.decision form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 4px 0; }
+.decision select { width: auto; flex: 1; }
